@@ -343,7 +343,7 @@
     <h1>Project <span>Countdown</span></h1>
     <p id="subtitle">Track your milestones</p>
   </div>
-  <button class="add-btn" onclick="openModal()">+ Add Timer</button>
+
 </header>
 
 <div id="timers"></div>
@@ -352,82 +352,12 @@
   <p>Add your first countdown to get started</p>
 </div>
 
-<!-- Modal -->
-<div class="modal-bg" id="modal" onclick="closeIfBg(event)">
-  <div class="modal">
-    <h2>New Countdown</h2>
-    <div class="field">
-      <label>Timer Name</label>
-      <input type="text" id="inp-name" placeholder="e.g. Design Handoff" maxlength="60">
-    </div>
-    <div class="field">
-      <label>Target Date & Time</label>
-      <input type="datetime-local" id="inp-date">
-    </div>
-    <div class="field">
-      <label>Project / Group (optional)</label>
-      <input type="text" id="inp-group" placeholder="e.g. Phase 1" maxlength="40">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="addTimer()">Add Timer</button>
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
 <script>
-  let timers = JSON.parse(localStorage.getItem('cdtimers') || '[]');
-
-  function save() {
-    localStorage.setItem('cdtimers', JSON.stringify(timers));
-  }
-
-  function openModal() {
-    // Default to tomorrow
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    d.setSeconds(0, 0);
-    document.getElementById('inp-date').value = d.toISOString().slice(0,16);
-    document.getElementById('inp-name').value = '';
-    document.getElementById('inp-group').value = '';
-    document.getElementById('modal').classList.add('open');
-    setTimeout(() => document.getElementById('inp-name').focus(), 50);
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.remove('open');
-  }
-
-  function closeIfBg(e) {
-    if (e.target.id === 'modal') closeModal();
-  }
-
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  function addTimer() {
-    const name = document.getElementById('inp-name').value.trim();
-    const date = document.getElementById('inp-date').value;
-    const group = document.getElementById('inp-group').value.trim();
-    if (!name || !date) {
-      document.getElementById(name ? 'inp-date' : 'inp-name').style.borderColor = '#ff4444';
-      setTimeout(() => {
-        document.getElementById('inp-name').style.borderColor = '';
-        document.getElementById('inp-date').style.borderColor = '';
-      }, 1000);
-      return;
-    }
-    timers.push({ id: Date.now(), name, date, group, created: new Date().toISOString() });
-    timers.sort((a, b) => new Date(a.date) - new Date(b.date));
-    save();
-    render();
-    closeModal();
-  }
-
-  function deleteTimer(id) {
-    timers = timers.filter(t => t.id !== id);
-    save();
-    render();
-  }
+  const timers = [
+    { id: 1, name: 'Building Handover',       date: '2026-07-01T08:30', group: '' },
+    { id: 2, name: 'Working from New Office',  date: '2026-10-05T08:30', group: '' },
+    { id: 3, name: 'Opening Day',              date: '2026-10-15T09:30', group: '' },
+  ];
 
   function getCountdown(dateStr) {
     const target = new Date(dateStr);
@@ -487,7 +417,6 @@
         card.className = 'timer-card' + (cd.done ? ' done' : urgent ? ' urgent' : '');
         card.id = 'tc-' + timer.id;
         card.innerHTML = `
-          <button class="delete-btn" onclick="deleteTimer(${timer.id})" title="Remove">✕</button>
           <div>
             <div class="timer-label">${timer.name}</div>
             <div class="timer-meta">${timer.group ? timer.group + ' · ' : ''}${dateStr}</div>
